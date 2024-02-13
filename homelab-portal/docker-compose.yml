@@ -11,7 +11,7 @@ services:
 
     environment:
       # Mysql/Maria connection parameters:
-      DB_MYSQL_HOST: "db"
+      DB_MYSQL_HOST: "sql-db"
       DB_MYSQL_PORT: 3306
       DB_MYSQL_USER: "npm"
       DB_MYSQL_PASSWORD: $MYSQL_PASSWORD
