@@ -1,0 +1,23 @@
+version: "3.8"
+services:
+  backrest:
+    image: garethgeorge/backrest:latest
+    container_name: backrest
+    hostname: backrest
+    volumes:
+      - ${BACKREST_DATA_PATH}:/data
+      - ${BACKREST_CONFIG_PATH}:/config
+      - ${BACKREST_CACHE_PATH}:/cache
+      - ${BACKREST_TMP_PATH}:/tmp
+      # - /path/to/backup:/backup         # Mount local paths to backup
+      # - /path/to/local/repos:/repos     # Mount local repos (optional for remote storage)
+    environment:
+      - BACKREST_DATA=/data
+      - BACKREST_CONFIG=/config/config.json
+      - XDG_CACHE_HOME=/cache
+      - TMPDIR=/tmp
+    env_file:
+      - .env
+    ports:
+      - "${BACKREST_PORT}:9898"
+    restart: unless-stopped
