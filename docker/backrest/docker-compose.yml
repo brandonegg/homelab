@@ -1,4 +1,3 @@
-version: "3.8"
 services:
   backrest:
     image: garethgeorge/backrest:latest
