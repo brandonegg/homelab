@@ -5,7 +5,7 @@ x-postgres_env: &postgres_env
 
 services:
   docmost:
-    image: docmost/docmost:latest
+    image: docmost/docmost:$DOCMOST_VERSION
     depends_on:
       - db
       - redis
