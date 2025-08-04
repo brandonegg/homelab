@@ -50,11 +50,11 @@ x-rails-env: &rails_env
 
 services:
   web:
-    image: ghcr.io/maybe-finance/maybe:${SURE_VERSION}
+    image: ghcr.io/we-promise/sure:${SURE_VERSION}
     volumes:
       - app-storage:/rails/storage
     ports:
-      - $SURE_PORT:3000
+      - 7788:3000
     restart: unless-stopped
     environment:
       <<: *rails_env
@@ -67,7 +67,7 @@ services:
       - maybe_net
 
   worker:
-    image: ghcr.io/maybe-finance/maybe:${SURE_VERSION}
+    image: ghcr.io/we-promise/sure:${SURE_VERSION}
     command: bundle exec sidekiq
     restart: unless-stopped
     depends_on:
