@@ -1,0 +1,8 @@
+    services:
+      github-runner:
+        image: myoung34/github-runner:latest
+        env:
+          - .env
+        volumes:
+          - ${DATA_PATH:-./.docker/github-runner-data}:/home/runner/_work # Example volume for runner data
+        restart: unless-stopped
