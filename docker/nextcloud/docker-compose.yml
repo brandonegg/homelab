@@ -5,7 +5,7 @@ x-shared-env: &shared-env
 
 services:
   nextcloud:
-    image: nextcloud
+    image: ${NEXTCLOUD_IMAGE:-nextcloud:latest}
     container_name: nextcloud
     restart: unless-stopped
     networks: 
