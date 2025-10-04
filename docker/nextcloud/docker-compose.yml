@@ -65,6 +65,32 @@ services:
     networks: 
       - nextcloud
 
+  dbbackups:
+    image: tiredofit/db-backup:latest
+    restart: always
+    depends_on:
+      - mariadb
+    networks: 
+      - nextcloud
+    volumes:
+      - ${APPDATA_DIR}/mariadb-backups:/backup
+    environment:
+      # --- Global/job defaults ---
+      DEFAULT_BACKUP_BEGIN: "0 * * * *"     # run at minute 0 every hour (cron)
+      DEFAULT_BACKUP_LOCATION: "FILESYSTEM"
+      DEFAULT_COMPRESSION: "GZ"             # gz, bz, xz, zstd, none
+      DEFAULT_CLEANUP_TIME: "10080"         # minutes to keep; 7 days = 7*24*60
+      # --- Job 1: MariaDB/MySQL connection/options ---
+      DB01_HOST: mariadb
+      DB01_PORT: "3306"
+      DB01_NAME: "${MYSQL_DATABASE}"        # or "ALL" to dump everything
+      DB01_USER: "${MYSQL_USER}"
+      DB01_PASS: "${MYSQL_PASSWORD}"
+      # Recommended mysqldump flags for consistent dumps:
+      DB01_MYSQL_SINGLE_TRANSACTION: "TRUE" # InnoDB-friendly consistent snapshots
+      DB01_MYSQL_STORED_PROCEDURES: "TRUE"  # include routines
+      DB01_MYSQL_EVENTS: "TRUE"             # include events
+
 networks:
   nextcloud:
     name: nextcloud
