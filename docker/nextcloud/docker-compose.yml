@@ -56,8 +56,6 @@ services:
       username: nextcloud
       domain: ${COLLABORA_DOMAIN:-example.com}
       extra_params: --o:ssl.enable=true
-    # ports:
-    #   - 9980:9980
 
   redis:
     image: redis:alpine
@@ -66,22 +64,6 @@ services:
       - nextcloud_redis:/data  
     networks: 
       - nextcloud
-  
-  # nginx-proxy:
-  #   image: 'jc21/nginx-proxy-manager:latest'
-  #   container_name: nginx-proxy
-  #   environment:
-  #     - PUID=1000
-  #     - PGID=1000
-  #     - TZ=America/Los_Angeles
-  #   restart: unless-stopped
-  #   ports:
-  #     - '80:80'
-  #     - '81:81'
-  #     - '443:443'
-  #   volumes:
-  #     - ./data:/data
-  #     - ./letsencrypt:/etc/letsencrypt
 
 networks:
   nextcloud:
