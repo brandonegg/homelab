@@ -1,0 +1,93 @@
+x-shared-env: &shared-env
+  PUID: 1000
+  PGID: 1000
+  TZ: ${TZ:-America/Chicago}
+
+services:
+  nextcloud:
+    image: nextcloud
+    container_name: nextcloud
+    restart: unless-stopped
+    networks: 
+      - nextcloud
+    depends_on:
+      - mariadb
+      - redis
+    ports:
+      - ${NEXTCLOUD_PORT:-8081}:80
+    volumes:
+      - ${APPDATA_DIR}/html:/var/www/html
+      - ${APPDATA_DIR}/custom_apps:/var/www/html/custom_apps
+      - ${APPDATA_DIR}/config:/var/www/html/config
+      - ${DATA_DIR}/data:/var/www/html/data
+    environment:
+      <<: *shared-env
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-nextcloud}
+      MYSQL_USER: ${MYSQL_USER:-nextcloud}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-dbpassword}
+      MYSQL_HOST: mariadb
+      REDIS_HOST: redis
+
+  mariadb:
+    image: mariadb
+    container_name: nextcloud-db
+    restart: unless-stopped
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    networks: 
+      - nextcloud
+    volumes:
+      - nextcloud_mariadb:/var/lib/mysql
+    environment:
+      <<: *shared-env
+      MYSQL_RANDOM_ROOT_PASSWORD: true
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-dbpassword}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-nextcloud}
+      MYSQL_USER: ${MYSQL_USER:-nextcloud}
+
+  collabora:
+    image: collabora/code
+    container_name: collabora
+    restart: unless-stopped
+    networks: 
+      - nextcloud
+    environment:
+      <<: *shared-env
+      password: password
+      username: nextcloud
+      domain: ${COLLABORA_DOMAIN:-example.com}
+      extra_params: --o:ssl.enable=true
+    # ports:
+    #   - 9980:9980
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    volumes:
+      - nextcloud_redis:/data  
+    networks: 
+      - nextcloud
+  
+  # nginx-proxy:
+  #   image: 'jc21/nginx-proxy-manager:latest'
+  #   container_name: nginx-proxy
+  #   environment:
+  #     - PUID=1000
+  #     - PGID=1000
+  #     - TZ=America/Los_Angeles
+  #   restart: unless-stopped
+  #   ports:
+  #     - '80:80'
+  #     - '81:81'
+  #     - '443:443'
+  #   volumes:
+  #     - ./data:/data
+  #     - ./letsencrypt:/etc/letsencrypt
+
+networks:
+  nextcloud:
+    name: nextcloud
+    driver: bridge
+
+volumes:
+  nextcloud_mariadb:
+  nextcloud_redis:
