@@ -29,7 +29,7 @@ services:
       REDIS_HOST: redis
 
   mariadb:
-    image: mariadb
+    image: mariadb:11.8
     container_name: nextcloud-db
     restart: unless-stopped
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
@@ -50,6 +50,8 @@ services:
     restart: unless-stopped
     networks: 
       - nextcloud
+    ports:
+      - 9981:9980
     environment:
       <<: *shared-env
       password: password
@@ -81,6 +83,7 @@ services:
       DEFAULT_COMPRESSION: "GZ"             # gz, bz, xz, zstd, none
       DEFAULT_CLEANUP_TIME: "10080"         # minutes to keep; 7 days = 7*24*60
       # --- Job 1: MariaDB/MySQL connection/options ---
+      DB01_TYPE: mysql
       DB01_HOST: mariadb
       DB01_PORT: "3306"
       DB01_NAME: "${MYSQL_DATABASE}"        # or "ALL" to dump everything
