@@ -3,6 +3,13 @@ x-shared-env: &shared-env
   PGID: 1000
   TZ: ${TZ:-America/Chicago}
 
+x-nextcloud-env: &nextcloud-env
+  MYSQL_DATABASE: ${MYSQL_DATABASE:-nextcloud}
+  MYSQL_USER: ${MYSQL_USER:-nextcloud}
+  MYSQL_PASSWORD: ${MYSQL_PASSWORD:-dbpassword}
+  MYSQL_HOST: mariadb
+  REDIS_HOST: redis
+
 services:
   nextcloud:
     image: ${NEXTCLOUD_IMAGE:-nextcloud:latest}
@@ -21,12 +28,24 @@ services:
       - ${APPDATA_DIR}/config:/var/www/html/config
       - ${DATA_DIR}/data:/var/www/html/data
     environment:
-      <<: *shared-env
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-nextcloud}
-      MYSQL_USER: ${MYSQL_USER:-nextcloud}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-dbpassword}
-      MYSQL_HOST: mariadb
-      REDIS_HOST: redis
+      <<: [*shared-env, *nextcloud-env]
+
+  nextcloud-cron:
+    image: ${NEXTCLOUD_IMAGE:-nextcloud:latest}
+    container_name: nextcloud-cron
+    restart: unless-stopped
+    networks: 
+      - nextcloud
+    environment:
+      <<: [*shared-env, *nextcloud-env]
+    volumes:
+      - ${APPDATA_DIR}/html:/var/www/html
+      - ${APPDATA_DIR}/custom_apps:/var/www/html/custom_apps
+      - ${APPDATA_DIR}/config:/var/www/html/config
+      - ${DATA_DIR}/data:/var/www/html/data
+    entrypoint: /cron.sh
+    depends_on:
+      - nextcloud
 
   mariadb:
     image: mariadb:11.8
